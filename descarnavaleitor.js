@@ -1,7 +1,8 @@
 // ==UserScript==
 // @name        Descarnavaleitor
 // @description Bloqueia notícias de carnaval
-// @match       *://(g1.globo.com|www.uol.com.br)/*
+// @match       *://g1.globo.com/*
+// @match       *://www.uol.com.br/*
 // ==/UserScript==
 
 "use strict";
@@ -23,6 +24,7 @@ const blocklist = [
     'unidos',
     'galo da madrugada',
     'bola preta',
+    'megablocos',
 
     // sp
     'gaviões',
@@ -72,7 +74,7 @@ const blocklist_lowercase = blocklist.map(it => it.toLowerCase());
 class SiteCleaner {
     clean() {
         let posts = this.search();
-        
+
         posts.forEach((post) => {
             let text = post.innerText.toLowerCase();
             let should_block = blocklist.some(it => text.includes(it));
@@ -108,11 +110,12 @@ const should_filter = url in site_handlers;
 if (url in site_handlers) {
     console.log('Descarnavaleitor: ' + url);
     const observer = new MutationObserver((mutationList, observer) => {
-        for (mutation of mutationList) {
+
+        mutationList.forEach(mutation => {
             if (mutation.type === 'childList') {
                 site_handlers[url].clean();
             }
-        }
+        });
     });
 
     observer.observe(
